@@ -1,0 +1,3 @@
+module Zdevice
+  # Your code goes here...
+end
