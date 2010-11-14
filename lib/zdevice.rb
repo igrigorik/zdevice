@@ -37,7 +37,7 @@ module ZMQ
 
     class Device
       attr_reader :name, :type
-      def initialize(name, ctx, conf = {})
+      def initialize(name, ctx, conf = {}, &blk)
         raise 'invalid name' if name == 'context'
         raise 'missing type' if !conf.key? :type
 
@@ -48,15 +48,27 @@ module ZMQ
         conf.each do |name, c|
           @sockets[name] = ZSocket.new(name, ctx, c)
         end
+
+      end
+
+      def start(&blk)
+        instance_eval &blk
       end
 
       def close
         @sockets.values.map {|s| s.close }
       end
+
+      def method_missing(method, *args, &blk)
+        if s = @sockets[method]
+          return s.socket
+        end
+        super
+      end
     end
 
     class ZSocket
-      attr_reader :name, :type
+      attr_reader :name, :type, :socket
       def initialize(name, ctx = nil, conf = {})
         raise 'invalid name' if name == 'type'
         raise 'missing type' if !conf.key? :type
@@ -70,7 +82,7 @@ module ZMQ
 
         @socket = ctx.socket @type
         (conf[:bind]    || []).each { |addr| @socket.bind addr }
-        (conf[:connect] || []).each { |addr| @socket.connect addr }
+        (conf[:connect] || []).each { |addr| @socket.connect(addr); @socket.setsockopt(ZMQ::SUBSCRIBE, '') }
       end
 
       def close
