@@ -6,25 +6,27 @@ module ZMQ
     class Builder
       def initialize(conf = {})
         @context = Context.new(conf.delete(:context))
-        @devices = {}
 
+        @devices = {}
         conf.each do |name, c|
-          p [name, c]
-          @devices[name] = Device.new(name, c)
+          @devices[name] = Device.new(name, @context.ctx, c)
         end
+      end
+
+      def close
+        @devices.values.map { |d| d.close }
       end
 
       def method_missing(method, *args, &blk)
         if d = @devices[method]
           return d
         end
-
         super
       end
     end
 
     class Context
-      attr_reader :iothreads, :verbose
+      attr_reader :iothreads, :verbose, :ctx
       def initialize(conf = {})
         @iothreads = conf[:iothreads] || 1
         @verbose   = conf[:verbose]   || false
@@ -35,29 +37,44 @@ module ZMQ
 
     class Device
       attr_reader :name, :type
-      def initialize(name, conf = {})
+      def initialize(name, ctx, conf = {})
         raise 'invalid name' if name == 'context'
         raise 'missing type' if !conf.key? :type
 
         @name = name
         @type = conf.delete(:type)
-        # TODO: open sockets...
+
+        @sockets = {}
+        conf.each do |name, c|
+          @sockets[name] = ZSocket.new(name, ctx, c)
+        end
+      end
+
+      def close
+        @sockets.values.map {|s| s.close }
       end
     end
 
     class ZSocket
       attr_reader :name, :type
-      def initialize(name, conf = {})
+      def initialize(name, ctx = nil, conf = {})
         raise 'invalid name' if name == 'type'
         raise 'missing type' if !conf.key? :type
 
-        # [:type, :bind, :connect, :option].each do |var|
-          # raise "missing #{var}" if !conf.key? var
-        # end
-
         @name = name
-        @type = conf.delete(:type)
+        @type = case conf.delete(:type).downcase
+          when :pub then ZMQ::PUB
+          when :sub then ZMQ::SUB
+          else 1
+        end
 
+        @socket = ctx.socket @type
+        (conf[:bind]    || []).each { |addr| @socket.bind addr }
+        (conf[:connect] || []).each { |addr| @socket.connect addr }
+      end
+
+      def close
+        @socket.close
       end
     end
 

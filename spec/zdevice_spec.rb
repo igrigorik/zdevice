@@ -3,20 +3,22 @@ require 'lib/zdevice'
 include ZMQ::Device
 describe ZMQ::Device do
 
+  let(:ctx) { ZMQ::Context.new }
+
   context Builder do
     it "should assemble a ZMQ Device" do
       b = Builder.new(
         context: { iothreads: 5},
         main: {
           type: :queue,
-          frontend: { type: :SUB, option: { hwm: 1, swap: 25}, bind: "tcp://127.0.0.1:5555" },
-          backend: { bind: "tcp://eth0:5556" }
+          frontend: { type: :SUB, option: { hwm: 1, swap: 25}, bind: ["tcp://127.0.0.1:5555"] },
+          backend: { type: :PUB, bind: ["tcp://127.0.0.1:5556"] }
         }
       )
 
       b.main.class.should == Device
       b.main.type.should == :queue
-
+      b.close
     end
   end
 
@@ -38,8 +40,8 @@ describe ZMQ::Device do
     end
 
     it "should validate name" do
-      lambda { Device.new('context', type: :a) }.should raise_error
-      d = Device.new('valid', type: :a)
+      lambda { Device.new('context', ctx, type: :a) }.should raise_error
+      d = Device.new('valid', nil, type: :a)
       d.name.should == 'valid'
     end
   end
@@ -48,13 +50,15 @@ describe ZMQ::Device do
     it "should have any name except 'type'" do
       lambda { ZSocket.new('type') }.should raise_error('invalid name')
 
-      s = ZSocket.new('valid', type: :queue)
+      s = ZSocket.new('valid', ctx, type: :queue)
       s.name.should == 'valid'
+      s.close
     end
 
     it "should have a type" do
-      s = ZSocket.new('valid', type: :queue)
-      s.type.should == :queue
+      s = ZSocket.new('valid', ctx, type: :queue)
+      s.type.should >= 0
+      s.close
     end
 
     # it "should have zero or more endpoints to bind the socket to"
