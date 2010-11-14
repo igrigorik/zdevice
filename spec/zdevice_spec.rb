@@ -6,6 +6,20 @@ describe ZMQ::Device do
 
   let(:ctx) { ZMQ::Context.new }
 
+  context Builder do
+    it "should symbolize configuration keys" do
+      b = Builder.new(
+        'context' => { 'iothreads' => 5 },
+        'main' => {
+          'type' => :queue,
+        }
+      )
+
+      b.main.class.should == Device
+      b.main.type.should == :queue
+    end
+  end
+
   context Context do
     it "should accept optional iothread count" do
       c = Context.new(iothreads: 5)

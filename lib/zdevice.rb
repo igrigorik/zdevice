@@ -5,12 +5,24 @@ module ZMQ
 
     class Builder
       def initialize(conf = {})
+        conf = symbolize_keys(conf)
         @context = Context.new(conf.delete(:context))
 
         @devices = {}
         conf.each do |name, c|
           @devices[name] = Device.new(name, @context.ctx, c)
         end
+      end
+
+      def symbolize_keys(conf)
+        recursive = Proc.new do |h, sh|
+          h.each do |k,v|
+            sh[k.to_sym] = v.is_a?(Hash) ? recursive.call(v, {}) : v
+          end
+          sh
+        end
+
+        recursive.call(conf, {})
       end
 
       def close
