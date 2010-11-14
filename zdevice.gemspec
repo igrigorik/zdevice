@@ -11,8 +11,11 @@ Gem::Specification.new do |s|
   s.homepage    = "http://rubygems.org/gems/zdevice"
   s.summary     = %q{TODO: Write a gem summary}
   s.description = %q{TODO: Write a gem description}
-
   s.rubyforge_project = "zdevice"
+
+  s.add_dependency "ffi"
+  s.add_dependency "ffi-rzmq"
+  s.add_development_dependency "rspec"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
