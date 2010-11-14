@@ -6,13 +6,13 @@ Gem::Specification.new do |s|
   s.name        = "ZDevice"
   s.version     = Zdevice::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["TODO: Write your name"]
-  s.email       = ["TODO: Write your email address"]
-  s.homepage    = "http://rubygems.org/gems/zdevice"
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
-  s.rubyforge_project = "zdevice"
+  s.authors     = ["Ilya Grigorik"]
+  s.email       = ["ilya@igvita.com"]
+  s.homepage    = "http://github.com/igrigorik/zdevice"
+  s.summary     = %q{ZDevice is a Ruby DSL for assembling arbitrary ZeroMQ routing devices, with support for the ZDCF configuration syntax.}
+  s.description = s.summary
 
+  s.rubyforge_project = "zdevice"
   s.add_dependency "ffi"
   s.add_dependency "ffi-rzmq"
   s.add_development_dependency "rspec"

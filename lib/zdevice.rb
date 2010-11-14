@@ -48,7 +48,6 @@ module ZMQ
         conf.each do |name, c|
           @sockets[name] = ZSocket.new(name, ctx, c)
         end
-
       end
 
       def start(&blk)
