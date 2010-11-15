@@ -58,8 +58,6 @@ describe ZMQ::Device do
       s.type.should >= 0
       s.close
     end
-
-    it "should setup subscription filters"
   end
 
 end

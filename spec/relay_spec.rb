@@ -43,7 +43,6 @@ describe "relay device" do
     Thread.new do
       loop do
         pub.send ZMQ::Message.new("queue test")
-        sleep(1)
       end
     end
 
