@@ -6,11 +6,17 @@ module ZMQ
     class Builder
       def initialize(conf = {})
         conf = symbolize_keys(conf)
-        @context = Context.new(conf.delete(:context))
 
+        @context = Context.new(conf.delete(:context))
         @devices = {}
+
         conf.each do |name, c|
           @devices[name] = Device.new(name, @context.ctx, c)
+          (class << self; self; end).class_eval do
+            define_method "#{name}" do
+              @devices[name]
+            end
+          end
         end
       end
 
@@ -27,13 +33,6 @@ module ZMQ
 
       def close
         @devices.values.map { |d| d.close }
-      end
-
-      def method_missing(method, *args, &blk)
-        if d = @devices[method]
-          return d
-        end
-        super
       end
     end
 
@@ -55,10 +54,15 @@ module ZMQ
 
         @name = name
         @type = conf.delete(:type)
-
         @sockets = {}
+
         conf.each do |name, c|
           @sockets[name] = ZSocket.new(name, ctx, c)
+          (class << self; self; end).class_eval do
+            define_method "#{name}" do
+              @sockets[name]
+            end
+          end
         end
       end
 
@@ -68,13 +72,6 @@ module ZMQ
 
       def close
         @sockets.values.map {|s| s.close }
-      end
-
-      def method_missing(method, *args, &blk)
-        if s = @sockets[method]
-          return s.socket
-        end
-        super
       end
     end
 
