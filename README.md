@@ -2,6 +2,8 @@
 
 ZDevice is a Ruby DSL for assembling arbitrary ZeroMQ routing devices, with support for the ZDCF configuration syntax.
 
+ * Blog post: [Routing with Ruby & ZeroMQ devices](http://www.igvita.com/2010/11/17/routing-with-ruby-zeromq-devices/)
+
 ## Example: PUB/SUB queue device
 
     b = ZMQ::Device::Builder.new(

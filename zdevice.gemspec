@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.authors     = ["Ilya Grigorik"]
   s.email       = ["ilya@igvita.com"]
   s.homepage    = "http://github.com/igrigorik/zdevice"
-  s.summary     = %q{ZDevice is a Ruby DSL for assembling arbitrary ZeroMQ routing devices, with support for the ZDCF configuration syntax.}
+  s.summary     = %q{ZDevice is a Ruby DSL for assembling arbitrary ZeroMQ routing devices, with support for the ZDCF configuration syntax}
   s.description = s.summary
 
   s.rubyforge_project = "zdevice"
